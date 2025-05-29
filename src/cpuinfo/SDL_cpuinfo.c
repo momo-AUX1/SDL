@@ -1140,6 +1140,22 @@ int SDL_GetSystemRAM(void)
             }
         }
 #endif
+
+#ifdef __WINRT__
+#include <winrt/Windows.System.h>
+
+    using namespace winrt;
+    using namespace Windows::System;
+
+    if (SDL_SystemRAM <= 0) {
+        // WinRT only has per app memory limits, so we use that.
+        uint64_t limit = MemoryManager::AppMemoryUsageLimit();
+        if (limit > 0) {
+            SDL_SystemRAM = static_cast<int>(limit / (1024 * 1024));
+        }
+    }
+#endif
+
 #ifdef __OS2__
         if (SDL_SystemRAM <= 0) {
             Uint32 sysram = 0;
